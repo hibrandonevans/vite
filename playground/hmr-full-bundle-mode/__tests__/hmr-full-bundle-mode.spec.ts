@@ -95,10 +95,14 @@ if (isBuild) {
   // BUNDLED -> GENERATING_HMR_PATCH -> BUNDLED
   test('generate hmr patch', async () => {
     await expect.poll(() => page.textContent('.hmr')).toBe('hello')
+    const patchResponsePromise = page.waitForResponse(/\/hmr_patch_\d+\.js$/)
     editFile('hmr.js', (code) =>
       code.replace("const foo = 'hello'", "const foo = 'hello1'"),
     )
     await expect.poll(() => page.textContent('.hmr')).toBe('hello1')
+    const patchResponse = await patchResponsePromise
+    const patchText = await patchResponse.text()
+    expect(patchText).toContain('export {}')
 
     editFile('hmr.js', (code) =>
       code.replace("const foo = 'hello1'", "const foo = 'hello'"),

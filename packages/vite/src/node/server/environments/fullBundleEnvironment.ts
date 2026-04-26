@@ -339,7 +339,11 @@ export class FullBundleDevEnvironment extends DevEnvironment {
       code: typeof hmrOutput.code === 'string' ? '[code]' : hmrOutput.code,
     })
 
-    this.memoryFiles.set(hmrOutput.filename, { source: hmrOutput.code })
+    this.memoryFiles.set(hmrOutput.filename, {
+      // ensure that the generated hmr patch contains ESM syntax
+      // this is to avoid attacks like GHSA-4v9v-hfq4-rm2v
+      source: hmrOutput.code + '\n; export {}',
+    })
     if (hmrOutput.sourcemapFilename && hmrOutput.sourcemap) {
       this.memoryFiles.set(hmrOutput.sourcemapFilename, {
         source: hmrOutput.sourcemap,
