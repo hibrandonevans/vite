@@ -339,7 +339,15 @@ export class FullBundleDevEnvironment extends DevEnvironment {
       code: typeof hmrOutput.code === 'string' ? '[code]' : hmrOutput.code,
     })
 
-    this.memoryFiles.set(hmrOutput.filename, { source: hmrOutput.code })
+    // Append `export {}` to ensure ESM syntax exists. This prevents untrusted
+    // origins from loading the patch as a classic script (export is invalid
+    // outside modules), working around browsers not sending Sec-Fetch-* headers
+    // for non-potentially-trustworthy origins.
+    const patchSource =
+      typeof hmrOutput.code === 'string'
+        ? hmrOutput.code + '\nexport {}'
+        : hmrOutput.code
+    this.memoryFiles.set(hmrOutput.filename, { source: patchSource })
     if (hmrOutput.sourcemapFilename && hmrOutput.sourcemap) {
       this.memoryFiles.set(hmrOutput.sourcemapFilename, {
         source: hmrOutput.sourcemap,

@@ -6,8 +6,8 @@ import type { Connect } from '#dep-types/connect'
  * We should avoid untrusted sites to load the script to avoid attacks like GHSA-4v9v-hfq4-rm2v.
  * This is because:
  * - the path of HMR patch files / entry point files can be predictable
- * - the HMR patch files may not include ESM syntax
- *   (if they include ESM syntax, loading as a classic script would fail)
+ * - the HMR patch files include ESM syntax to prevent loading as a classic
+ *   script, but entry point files may not
  * - the HMR runtime in the browser has the list of all loaded modules
  *
  * https://github.com/webpack/webpack-dev-server/security/advisories/GHSA-4v9v-hfq4-rm2v
